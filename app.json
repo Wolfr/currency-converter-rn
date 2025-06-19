@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "my-react-native-reusables-app",
-    "slug": "my-react-native-reusables-app",
+    "name": "multi-currency-converter-rn",
+    "slug": "multi-currency-converter-rn",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",

@@ -4,7 +4,8 @@ import { Stack } from 'expo-router';
 import * as React from 'react';
 
 import { PortalHost } from '@rn-primitives/portal';
-import {EditCurrenciesToggle} from "~/components/EditCurrenciesToggle";
+import { EditCurrenciesToggle } from "~/components/EditCurrenciesToggle";
+import { LanguageToggle } from "~/components/LanguageToggle";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -13,23 +14,24 @@ export {
 
 export default function RootLayout() {
   return (
-      <>
-        <Stack>
-            <Stack.Screen
-              name='index'
-              options={{
-                  // headerLeft: () => ,
-                title: 'Currency Converter',
-              headerRight: () => <EditCurrenciesToggle />,
-              }}
-            />
-            <Stack.Screen
-              name='edit-currencies'
-              options={{
-                title: 'Edit Currencies',
-              }}
-            />
-        </Stack>
+    <>
+      <Stack>
+        <Stack.Screen
+          name='index'
+          options={{
+            title: 'Currency Converter',
+            headerLeft: () => <LanguageToggle />,
+            headerRight: () => <EditCurrenciesToggle />,
+          }}
+        />
+        <Stack.Screen
+          name='(modal)'
+          options={{
+            headerShown: false,
+            presentation: 'modal',
+          }}
+        />
+      </Stack>
       <PortalHost />
     </>
   );
