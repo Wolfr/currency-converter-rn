@@ -14,9 +14,13 @@ export default function Screen() {
   const [selectedCurrencies] = React.useState<CurrencyCode[]>(['USD', 'EUR', 'GBP', 'JPY']);
   const [activeCurrency, setActiveCurrency] = React.useState<CurrencyCode>('USD');
   const [amount, setAmount] = React.useState('0');
+  const [isNewAmount, setIsNewAmount] = React.useState(false);
 
   const appendDigit = (digit: string) => {
-    if (amount === '0' && digit !== '.') {
+    if (isNewAmount) {
+      setAmount(digit);
+      setIsNewAmount(false);
+    } else if (amount === '0' && digit !== '.') {
       setAmount(digit);
     } else if (!amount.includes('.') || digit !== '.') {
       setAmount(prev => prev + digit);
@@ -25,10 +29,14 @@ export default function Screen() {
 
   const clearAmount = () => {
     setAmount('0');
+    setIsNewAmount(false);
   };
 
   const handleBackspace = () => {
-    if (amount.length > 1) {
+    if (isNewAmount) {
+      setAmount('0');
+      setIsNewAmount(false);
+    } else if (amount.length > 1) {
       setAmount(prev => prev.slice(0, -1));
     } else {
       setAmount('0');
@@ -46,6 +54,13 @@ export default function Screen() {
     return converted.toFixed(2);
   };
 
+  const handleCurrencyChange = (newCurrency: CurrencyCode) => {
+    if (newCurrency === activeCurrency) return;
+    
+    setActiveCurrency(newCurrency);
+    setIsNewAmount(true);
+  };
+
   const renderKeypad = () => (
     <View className='gap-2'>
       {/* Row 1: 7-8-9 */}
@@ -55,6 +70,12 @@ export default function Screen() {
             key={digit}
             onPress={() => appendDigit(digit)}
             className='flex-1 bg-white rounded-lg h-14 items-center justify-center'
+            style={({ pressed }) => [
+              {
+                backgroundColor: pressed ? '#F3F4F6' : 'white',
+                transform: [{ scale: pressed ? 0.97 : 1 }]
+              }
+            ]}
           >
             <Text className='text-xl'>{digit}</Text>
           </Pressable>
@@ -68,6 +89,12 @@ export default function Screen() {
             key={digit}
             onPress={() => appendDigit(digit)}
             className='flex-1 bg-white rounded-lg h-14 items-center justify-center'
+            style={({ pressed }) => [
+              {
+                backgroundColor: pressed ? '#F3F4F6' : 'white',
+                transform: [{ scale: pressed ? 0.97 : 1 }]
+              }
+            ]}
           >
             <Text className='text-xl'>{digit}</Text>
           </Pressable>
@@ -81,6 +108,12 @@ export default function Screen() {
             key={digit}
             onPress={() => appendDigit(digit)}
             className='flex-1 bg-white rounded-lg h-14 items-center justify-center'
+            style={({ pressed }) => [
+              {
+                backgroundColor: pressed ? '#F3F4F6' : 'white',
+                transform: [{ scale: pressed ? 0.97 : 1 }]
+              }
+            ]}
           >
             <Text className='text-xl'>{digit}</Text>
           </Pressable>
@@ -92,18 +125,36 @@ export default function Screen() {
         <Pressable
           onPress={() => appendDigit('.')}
           className='flex-1 bg-white rounded-lg h-14 items-center justify-center'
+          style={({ pressed }) => [
+            {
+              backgroundColor: pressed ? '#F3F4F6' : 'white',
+              transform: [{ scale: pressed ? 0.97 : 1 }]
+            }
+          ]}
         >
           <Text className='text-xl'>.</Text>
         </Pressable>
         <Pressable
           onPress={() => appendDigit('0')}
           className='flex-1 bg-white rounded-lg h-14 items-center justify-center'
+          style={({ pressed }) => [
+            {
+              backgroundColor: pressed ? '#F3F4F6' : 'white',
+              transform: [{ scale: pressed ? 0.97 : 1 }]
+            }
+          ]}
         >
           <Text className='text-xl'>0</Text>
         </Pressable>
         <Pressable
           onPress={handleBackspace}
           className='flex-1 bg-white rounded-lg h-14 items-center justify-center'
+          style={({ pressed }) => [
+            {
+              backgroundColor: pressed ? '#F3F4F6' : 'white',
+              transform: [{ scale: pressed ? 0.97 : 1 }]
+            }
+          ]}
         >
           <X size={24} />
         </Pressable>
@@ -113,6 +164,12 @@ export default function Screen() {
       <Pressable
         onPress={clearAmount}
         className='bg-white rounded-lg h-14 items-center justify-center'
+        style={({ pressed }) => [
+          {
+            backgroundColor: pressed ? '#F3F4F6' : 'white',
+            transform: [{ scale: pressed ? 0.97 : 1 }]
+          }
+        ]}
       >
         <Text className='text-xl'>Clear</Text>
       </Pressable>
@@ -129,7 +186,7 @@ export default function Screen() {
           return (
             <Pressable
               key={currency.code}
-              onPress={() => setActiveCurrency(currency.code)}
+              onPress={() => handleCurrencyChange(currency.code)}
               className={`flex-row items-center bg-white rounded-lg p-3 ${isActive ? 'border-2 border-primary' : 'border-2 border-transparent'}`}
             >
               <View className='flex-row flex-1 items-center gap-2'>
@@ -139,9 +196,13 @@ export default function Screen() {
                 </View>
               </View>
               
-              <Text className='text-lg font-medium'>
-                {isActive ? amount : convertAmount(activeCurrency, currency.code, amount)}
-              </Text>
+              {isActive && isNewAmount ? (
+                <Text className='text-lg text-gray-400'>Enter amount</Text>
+              ) : (
+                <Text className='text-lg font-medium'>
+                  {isActive ? amount : convertAmount(activeCurrency, currency.code, amount)}
+                </Text>
+              )}
             </Pressable>
           );
         })}
@@ -161,13 +222,14 @@ export default function Screen() {
     >
       {isLandscape ? (
         // Landscape layout
-        <View className='flex-1 flex-row p-4 gap-4'>
-          <View className='flex-1'>
+        <View className='flex-1 flex-row gap-4'>
+          <View className='flex-1 p-4'>
             {renderCurrencyList()}
           </View>
-          <View className='w-[280px]' style={{ 
+          <View className='justify-end p-4' style={{ 
             // Add extra padding for Dynamic Island in landscape
-            paddingTop: Platform.OS === 'ios' ? 12 : 0
+            paddingTop: Platform.OS === 'ios' ? 12 : 0,
+            width: 280
           }}>
             {renderKeypad()}
           </View>
@@ -175,10 +237,10 @@ export default function Screen() {
       ) : (
         // Portrait layout
         <View className='flex-1'>
-          <View className='flex-1 p-4'>
+          <View className='p-4'>
             {renderCurrencyList()}
           </View>
-          <View className='p-4 pb-8'>
+          <View className='mt-auto p-4 pb-8'>
             {renderKeypad()}
           </View>
         </View>

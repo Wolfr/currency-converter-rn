@@ -57,25 +57,31 @@ export default function EditCurrenciesScreen() {
 
         {/* Currency List */}
         <View className='gap-2'>
-          {filteredCurrencies.map((currency) => (
-            <View
-              key={currency.code}
-              className='flex-row items-center bg-white rounded-lg p-3'
-            >
-              <View className='flex-row flex-1 items-center gap-2'>
-                <Text className='text-xl'>{currency.flag}</Text>
-                <View>
-                  <Text className='font-medium text-lg'>{currency.name}</Text>
-                  <Text className='text-xs text-gray-500'>{currency.code}</Text>
+          {filteredCurrencies.map((currency) => {
+            const isSelected = selectedCurrencies.includes(currency.code);
+            
+            return (
+              <Pressable
+                key={currency.code}
+                onPress={() => toggleCurrency(currency.code)}
+                className='flex-row items-center bg-white rounded-lg p-3 active:bg-gray-50'
+              >
+                <View className='flex-row flex-1 items-center gap-2'>
+                  <Text className='text-xl'>{currency.flag}</Text>
+                  <View>
+                    <Text className='text-l'>{currency.code}</Text>
+                  </View>
                 </View>
-              </View>
-              
-              <Checkbox
-                checked={selectedCurrencies.includes(currency.code)}
-                onCheckedChange={() => toggleCurrency(currency.code)}
-              />
-            </View>
-          ))}
+                
+                <View pointerEvents="none">
+                  <Checkbox
+                    checked={isSelected}
+                    onCheckedChange={() => toggleCurrency(currency.code)}
+                  />
+                </View>
+              </Pressable>
+            );
+          })}
         </View>
       </View>
     </ScrollView>
