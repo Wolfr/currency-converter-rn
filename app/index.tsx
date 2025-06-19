@@ -104,7 +104,10 @@ export default function Screen() {
           disabled={amount === '0'} 
         />
       </View>
-      <KeypadButton label='Clear' onPress={clearAmount} />
+      <View className='flex-row gap-2'>
+          <KeypadButton label="Clear" onPress={() => clearAmount()} />
+      </View>
+
     </View>
   );
 
@@ -144,7 +147,7 @@ export default function Screen() {
 
   return (
     <View 
-      className='flex-1 bg-gray-100'
+      className='flex-1 justify-between h-full bg-gray-100'
       style={{
         paddingTop: insets.top,
         paddingBottom: insets.bottom,
@@ -165,7 +168,7 @@ export default function Screen() {
           </View>
         </View>
       ) : (
-        <View className='flex-1'>
+        <View>
           <View className='p-4'>
             {renderCurrencyList()}
           </View>

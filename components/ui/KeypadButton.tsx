@@ -1,6 +1,5 @@
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { cn } from '~/lib/utils';
 
 interface KeypadButtonProps {
