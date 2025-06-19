@@ -30,7 +30,7 @@ export default function EditCurrenciesScreen() {
   });
 
   return (
-    <ScrollView className='flex-1 bg-secondary/30'>
+    <ScrollView className='flex-1 bg-gray-100'>
       <View className='p-4 gap-4'>
 
         <View className='flex-row items-center bg-white rounded-lg px-3 h-12'>

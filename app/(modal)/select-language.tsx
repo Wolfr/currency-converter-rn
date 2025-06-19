@@ -26,7 +26,7 @@ export default function SelectLanguageScreen() {
   };
 
   return (
-    <View className='flex-1 bg-secondary/30'>
+    <View className='flex-1 bg-gray-100'>
       <ScrollView className='flex-1 p-4'>
         <View className='gap-2'>
           {LANGUAGES.map((language) => (

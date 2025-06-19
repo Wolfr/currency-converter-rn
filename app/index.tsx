@@ -125,7 +125,7 @@ export default function Screen() {
 
   return (
     <View 
-      className='flex-1 bg-secondary/30'
+      className='flex-1 bg-gray-100'
       style={{
         paddingTop: insets.top,
         paddingBottom: insets.bottom,
