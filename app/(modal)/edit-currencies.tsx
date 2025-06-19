@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { View, ScrollView, TextInput, Pressable } from 'react-native';
 import { Text } from '~/components/ui/text';
-import { Checkbox } from '~/components/ui/checkbox';
+import { Switch } from '~/components/ui/switch';
 import { AVAILABLE_CURRENCIES } from '~/lib/constants';
 import { Search, X } from 'lucide-react-native';
 
@@ -32,7 +32,7 @@ export default function EditCurrenciesScreen() {
   return (
     <ScrollView className='flex-1 bg-secondary/30'>
       <View className='p-4 gap-4'>
-        {/* Search Input */}
+
         <View className='flex-row items-center bg-white rounded-lg px-3 h-12'>
           <Search size={20} color="#666" />
           <TextInput
@@ -55,7 +55,6 @@ export default function EditCurrenciesScreen() {
           )}
         </View>
 
-        {/* Currency List */}
         <View className='gap-2'>
           {filteredCurrencies.map((currency) => {
             const isSelected = selectedCurrencies.includes(currency.code);
@@ -74,7 +73,7 @@ export default function EditCurrenciesScreen() {
                 </View>
                 
                 <View pointerEvents="none">
-                  <Checkbox
+                  <Switch
                     checked={isSelected}
                     onCheckedChange={() => toggleCurrency(currency.code)}
                   />
