@@ -1,13 +1,7 @@
-# Starter base (customized)
+# Multi Currency Converter - React Native 
 
-A starting point to help you set up your project quickly and use the common components provided by `react-native-reusables`. The idea is to make it easier for you to get started.
+Based on React Native Reusables template.
 
-## Features
+Licensed as CC By 4.0 (attribution), see LICENSE.md
 
-- NativeWind v4
-- Common components
-  - EditCurrenciesToggle, Avatar, Button, Card, Progress, Text, Tooltip
-
-<img src="https://github.com/mrzachnugent/react-native-reusables/assets/63797719/42c94108-38a7-498b-9c70-18640420f1bc"
-     alt="starter-base-template"
-     style="width:270px;" />
+Blog post: https://johanronsse.be/2025/06/19/a-react-native-version-of-multi-currency-converter-in-3-hours/ 
