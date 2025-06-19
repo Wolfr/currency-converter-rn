@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { View, Pressable, ScrollView, useWindowDimensions, Platform } from 'react-native';
+import { View, Pressable, ScrollView, useWindowDimensions, Platform, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '~/components/ui/text';
-import { AVAILABLE_CURRENCIES, MOCK_EXCHANGE_RATES, type CurrencyCode } from '~/lib/constants';
 import { Delete } from 'lucide-react-native';
 import KeypadButton from '~/components/ui/KeypadButton';
 import { getSelectedCurrencies } from '~/lib/utils';
 import { useIsFocused } from '@react-navigation/native';
+import { fetchExchangeRates, fetchSupportedCurrencies, type Currency } from '~/lib/api';
 
 export default function Screen() {
   const { width, height } = useWindowDimensions();
@@ -14,22 +14,52 @@ export default function Screen() {
   const isLandscape = width > height;
   const isFocused = useIsFocused();
 
-  const [selectedCurrencies, setSelectedCurrencies] = React.useState<CurrencyCode[]>([]);
-  const [activeCurrency, setActiveCurrency] = React.useState<CurrencyCode>('USD');
+  const [selectedCurrencies, setSelectedCurrencies] = React.useState<string[]>([]);
+  const [activeCurrency, setActiveCurrency] = React.useState<string>('USD');
   const [amount, setAmount] = React.useState('0');
   const [isNewAmount, setIsNewAmount] = React.useState(false);
+  const [currencies, setCurrencies] = React.useState<Currency[]>([]);
+  const [exchangeRates, setExchangeRates] = React.useState<Record<string, number>>({});
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
 
-  // Load saved currencies on mount and when screen is focused
+  // Load currencies and exchange rates
   React.useEffect(() => {
-    const loadCurrencies = async () => {
-      const saved = await getSelectedCurrencies();
-      setSelectedCurrencies(saved as CurrencyCode[]);
-      if (!saved.includes(activeCurrency)) {
-        setActiveCurrency(saved[0] as CurrencyCode);
+    const loadData = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // Load selected currencies first
+        const saved = await getSelectedCurrencies();
+        setSelectedCurrencies(saved);
+        if (!saved.includes(activeCurrency)) {
+          setActiveCurrency(saved[0]);
+        }
+
+        // Fetch currencies
+        const { currencies: fetchedCurrencies, error: currenciesError } = await fetchSupportedCurrencies();
+        if (currenciesError) throw new Error(currenciesError);
+        if (!fetchedCurrencies) throw new Error('No currencies fetched');
+        
+        setCurrencies(fetchedCurrencies);
+
+        // Fetch exchange rates only for selected currencies
+        const { rates, error: ratesError } = await fetchExchangeRates(saved);
+        if (ratesError) throw new Error(ratesError);
+        if (!rates) throw new Error('No exchange rates fetched');
+
+        setExchangeRates(rates);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+        console.error('Error loading data:', err);
+      } finally {
+        setIsLoading(false);
       }
     };
-    loadCurrencies();
-  }, [isFocused]);
+
+    loadData();
+  }, [isFocused]); // Reload when screen is focused
 
   const appendDigit = (digit: string) => {
     if (isNewAmount) {
@@ -58,18 +88,18 @@ export default function Screen() {
     }
   };
 
-  const convertAmount = (from: CurrencyCode, to: CurrencyCode, amount: string): string => {
+  const convertAmount = (from: string, to: string, amount: string): string => {
     const numericAmount = parseFloat(amount);
-    if (isNaN(numericAmount)) return '0.00';
+    if (isNaN(numericAmount) || !exchangeRates[from] || !exchangeRates[to]) return '0.00';
     
-    // Convert to USD first (our base rate), then to target currency
-    const inUSD = numericAmount / MOCK_EXCHANGE_RATES[from];
-    const converted = inUSD * MOCK_EXCHANGE_RATES[to];
+    // Convert using USD as the base currency
+    const inUSD = numericAmount / exchangeRates[from];
+    const converted = inUSD * exchangeRates[to];
     
     return converted.toFixed(2);
   };
 
-  const handleCurrencyChange = (newCurrency: CurrencyCode) => {
+  const handleCurrencyChange = (newCurrency: string) => {
     if (newCurrency === activeCurrency) return;
     
     setActiveCurrency(newCurrency);
@@ -107,49 +137,70 @@ export default function Screen() {
       <View className='flex-row gap-2'>
           <KeypadButton label="Clear" onPress={() => clearAmount()} />
       </View>
-
     </View>
   );
 
-  const renderCurrencyList = () => (
-    <ScrollView>
-      <View className='gap-2'>
-        {selectedCurrencies.map((currencyCode) => {
-          const currency = AVAILABLE_CURRENCIES.find(c => c.code === currencyCode)!;
-          const isActive = activeCurrency === currencyCode;
-          
-          return (
-            <Pressable
-              key={currency.code}
-              onPress={() => handleCurrencyChange(currency.code)}
-              className={`flex-row items-center bg-white rounded-lg p-3 ${isActive ? 'border-2 border-primary' : 'border-2 border-transparent'}`}
-            >
-              <View className='flex-row flex-1 items-center gap-2'>
-                <Text className='text-xl'>{currency.flag}</Text>
-                <View>
-                  <Text className='text-l'>{currency.code}</Text>
+  const renderCurrencyList = () => {
+    if (isLoading) {
+      return (
+        <View className='flex-1 items-center justify-center mt-8'>
+          <ActivityIndicator size="large" className='mb-4' />
+          <Text className='text-gray-500'>Loading currencies...</Text>
+        </View>
+      );
+    }
+
+    if (error) {
+      return (
+        <View className='flex-1 items-center justify-center p-4'>
+          <Text className='text-red-500 text-center mb-2'>{error}</Text>
+          <Text className='text-gray-500 text-center'>Please check your internet connection and try again.</Text>
+        </View>
+      );
+    }
+
+    return (
+      <ScrollView>
+        <View className='gap-2'>
+          {selectedCurrencies.map((currencyCode) => {
+            const currency = currencies.find(c => c.code === currencyCode);
+            if (!currency) return null;
+            
+            const isActive = activeCurrency === currencyCode;
+            
+            return (
+              <Pressable
+                key={currency.code}
+                onPress={() => handleCurrencyChange(currency.code)}
+                className={`flex-row items-center bg-white rounded-lg p-3 ${isActive ? 'border-2 border-primary' : 'border-2 border-transparent'}`}
+              >
+                <View className='flex-row flex-1 items-center gap-2'>
+                  <Text className='text-xl'>{currency.flag}</Text>
+                  <View>
+                    <Text className='text-l'>{currency.code}</Text>
+                    <Text className='text-sm text-gray-500'>{currency.name}</Text>
+                  </View>
                 </View>
-              </View>
-              
-              {isActive && isNewAmount ? (
-                <Text className='text-lg text-gray-400'>Enter amount</Text>
-              ) : (
-                <Text className='text-lg font-medium'>
-                  {isActive ? amount : convertAmount(activeCurrency, currency.code, amount)}
-                </Text>
-              )}
-            </Pressable>
-          );
-        })}
-      </View>
-    </ScrollView>
-  );
+                
+                {isActive && isNewAmount ? (
+                  <Text className='text-lg text-gray-400'>Enter amount</Text>
+                ) : (
+                  <Text className='text-lg font-medium'>
+                    {isActive ? amount : convertAmount(activeCurrency, currency.code, amount)}
+                  </Text>
+                )}
+              </Pressable>
+            );
+          })}
+        </View>
+      </ScrollView>
+    );
+  };
 
   return (
     <View 
-      className='flex-1 justify-between h-full bg-gray-100'
+      className='flex-1 justify-between bg-gray-100'
       style={{
-        paddingTop: insets.top,
         paddingBottom: insets.bottom,
         paddingLeft: insets.left,
         paddingRight: insets.right,
