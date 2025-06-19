@@ -41,14 +41,15 @@ function SwitchNative({
 }: SwitchPrimitives.RootProps & {
   ref?: React.RefObject<SwitchPrimitives.RootRef>;
 }) {
-  const translateX = useDerivedValue(() => (props.checked ? 18 : 0));
+  const translateX = useDerivedValue(() => (props.checked ? 19 : 1));
   const animatedRootStyle = useAnimatedStyle(() => {
     return {
       backgroundColor: interpolateColor(
         translateX.value,
-        [0, 18],
-        ['rgb(228, 228, 231)', 'rgb(24, 24, 27)']
+        [1, 19],
+        ['rgb(229, 231, 235)', 'rgb(0, 0, 0)']
       ),
+      borderRadius: 999,
     };
   });
   const animatedThumbStyle = useAnimatedStyle(() => ({
@@ -58,19 +59,21 @@ function SwitchNative({
   return (
     <Animated.View
       style={animatedRootStyle}
-      className={cn('h-8 w-[46px] rounded-full', props.disabled && 'opacity-50')}
+      className={cn('h-6 w-11', props.disabled && 'opacity-50')}
     >
       <SwitchPrimitives.Root
         className={cn(
-          'flex-row h-8 w-[46px] shrink-0 items-center rounded-full border-2 border-transparent',
-          props.checked ? 'bg-primary' : 'bg-input',
+          'flex-row h-6 w-11 shrink-0 items-center border-[1px] border-transparent overflow-hidden',
+          props.checked ? 'bg-black' : 'bg-gray-200',
           className
         )}
+        style={{ borderRadius: 999 }}
         {...props}
       >
         <Animated.View style={animatedThumbStyle}>
           <SwitchPrimitives.Thumb
-            className={'h-7 w-7 rounded-full bg-background  ring-0'}
+            className='h-5 w-5 bg-white'
+            style={{ borderRadius: 999 }}
           />
         </Animated.View>
       </SwitchPrimitives.Root>
