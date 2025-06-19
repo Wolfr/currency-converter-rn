@@ -40,14 +40,11 @@ export default function SelectLanguageScreen() {
             </Button>
           ))}
         </View>
-      </ScrollView>
-
-      {/* Version and attribution */}
-      <View className='p-4 items-center'>
-        <Text className='text-sm text-gray-500 text-center'>
+        <Text className='text-sm text-gray-500 text-center pt-4 pb-4'>
           Multi Currency Converter v1.3.0 is a free app by Obra Studio.
         </Text>
-      </View>
+
+      </ScrollView>
     </View>
   );
 } 
