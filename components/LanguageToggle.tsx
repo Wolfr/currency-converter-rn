@@ -8,7 +8,7 @@ export function LanguageToggle() {
 
   return (
     <Pressable onPress={() => router.push('/select-language')}>
-      <Languages className="h-6 w-6" />
+      <Languages />
     </Pressable>
   );
 } 

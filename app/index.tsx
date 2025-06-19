@@ -3,7 +3,9 @@ import { View, Pressable, ScrollView, useWindowDimensions, Platform } from 'reac
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '~/components/ui/text';
 import { AVAILABLE_CURRENCIES, MOCK_EXCHANGE_RATES, type CurrencyCode } from '~/lib/constants';
-import { X } from 'lucide-react-native';
+import { X, Delete } from 'lucide-react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import KeypadButton from '~/components/ui/KeypadButton';
 
 export default function Screen() {
   const { width, height } = useWindowDimensions();
@@ -66,113 +68,33 @@ export default function Screen() {
       {/* Row 1: 7-8-9 */}
       <View className='flex-row gap-2'>
         {['7', '8', '9'].map(digit => (
-          <Pressable
-            key={digit}
-            onPress={() => appendDigit(digit)}
-            className='flex-1 bg-white rounded-lg h-14 items-center justify-center'
-            style={({ pressed }) => [
-              {
-                backgroundColor: pressed ? '#F3F4F6' : 'white',
-                transform: [{ scale: pressed ? 0.97 : 1 }]
-              }
-            ]}
-          >
-            <Text className='text-xl'>{digit}</Text>
-          </Pressable>
+          <KeypadButton key={digit} label={digit} onPress={() => appendDigit(digit)} />
         ))}
       </View>
       
       {/* Row 2: 4-5-6 */}
       <View className='flex-row gap-2'>
         {['4', '5', '6'].map(digit => (
-          <Pressable
-            key={digit}
-            onPress={() => appendDigit(digit)}
-            className='flex-1 bg-white rounded-lg h-14 items-center justify-center'
-            style={({ pressed }) => [
-              {
-                backgroundColor: pressed ? '#F3F4F6' : 'white',
-                transform: [{ scale: pressed ? 0.97 : 1 }]
-              }
-            ]}
-          >
-            <Text className='text-xl'>{digit}</Text>
-          </Pressable>
+          <KeypadButton key={digit} label={digit} onPress={() => appendDigit(digit)} />
         ))}
       </View>
       
       {/* Row 3: 1-2-3 */}
       <View className='flex-row gap-2'>
         {['1', '2', '3'].map(digit => (
-          <Pressable
-            key={digit}
-            onPress={() => appendDigit(digit)}
-            className='flex-1 bg-white rounded-lg h-14 items-center justify-center'
-            style={({ pressed }) => [
-              {
-                backgroundColor: pressed ? '#F3F4F6' : 'white',
-                transform: [{ scale: pressed ? 0.97 : 1 }]
-              }
-            ]}
-          >
-            <Text className='text-xl'>{digit}</Text>
-          </Pressable>
+          <KeypadButton key={digit} label={digit} onPress={() => appendDigit(digit)} />
         ))}
       </View>
       
       {/* Row 4: .-0-backspace */}
       <View className='flex-row gap-2'>
-        <Pressable
-          onPress={() => appendDigit('.')}
-          className='flex-1 bg-white rounded-lg h-14 items-center justify-center'
-          style={({ pressed }) => [
-            {
-              backgroundColor: pressed ? '#F3F4F6' : 'white',
-              transform: [{ scale: pressed ? 0.97 : 1 }]
-            }
-          ]}
-        >
-          <Text className='text-xl'>.</Text>
-        </Pressable>
-        <Pressable
-          onPress={() => appendDigit('0')}
-          className='flex-1 bg-white rounded-lg h-14 items-center justify-center'
-          style={({ pressed }) => [
-            {
-              backgroundColor: pressed ? '#F3F4F6' : 'white',
-              transform: [{ scale: pressed ? 0.97 : 1 }]
-            }
-          ]}
-        >
-          <Text className='text-xl'>0</Text>
-        </Pressable>
-        <Pressable
-          onPress={handleBackspace}
-          className='flex-1 bg-white rounded-lg h-14 items-center justify-center'
-          style={({ pressed }) => [
-            {
-              backgroundColor: pressed ? '#F3F4F6' : 'white',
-              transform: [{ scale: pressed ? 0.97 : 1 }]
-            }
-          ]}
-        >
-          <X size={24} />
-        </Pressable>
+        <KeypadButton label='.' onPress={() => appendDigit('.')} />
+        <KeypadButton label='0' onPress={() => appendDigit('0')} />
+        <KeypadButton label='' onPress={handleBackspace} isIcon={true} IconComponent={<Delete size={24} strokeWidth={2.5} />} />
       </View>
 
       {/* Row 5: Clear (full width) */}
-      <Pressable
-        onPress={clearAmount}
-        className='bg-white rounded-lg h-14 items-center justify-center'
-        style={({ pressed }) => [
-          {
-            backgroundColor: pressed ? '#F3F4F6' : 'white',
-            transform: [{ scale: pressed ? 0.97 : 1 }]
-          }
-        ]}
-      >
-        <Text className='text-xl'>Clear</Text>
-      </Pressable>
+      <KeypadButton label='Clear' onPress={clearAmount} />
     </View>
   );
 
