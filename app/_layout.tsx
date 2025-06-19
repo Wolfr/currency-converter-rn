@@ -30,6 +30,7 @@ export default function RootLayout() {
           options={{
             headerShown: false,
             presentation: 'modal',
+            headerTitleAlign: 'center'
           }}
         />
       </Stack>

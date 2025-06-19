@@ -3,20 +3,33 @@ import { View, Pressable, ScrollView, useWindowDimensions, Platform } from 'reac
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '~/components/ui/text';
 import { AVAILABLE_CURRENCIES, MOCK_EXCHANGE_RATES, type CurrencyCode } from '~/lib/constants';
-import { X, Delete } from 'lucide-react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { Delete } from 'lucide-react-native';
 import KeypadButton from '~/components/ui/KeypadButton';
+import { getSelectedCurrencies } from '~/lib/utils';
+import { useIsFocused } from '@react-navigation/native';
 
 export default function Screen() {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const isLandscape = width > height;
+  const isFocused = useIsFocused();
 
-  // In a real app, this would come from your global state management
-  const [selectedCurrencies] = React.useState<CurrencyCode[]>(['USD', 'EUR', 'GBP', 'JPY']);
+  const [selectedCurrencies, setSelectedCurrencies] = React.useState<CurrencyCode[]>([]);
   const [activeCurrency, setActiveCurrency] = React.useState<CurrencyCode>('USD');
   const [amount, setAmount] = React.useState('0');
   const [isNewAmount, setIsNewAmount] = React.useState(false);
+
+  // Load saved currencies on mount and when screen is focused
+  React.useEffect(() => {
+    const loadCurrencies = async () => {
+      const saved = await getSelectedCurrencies();
+      setSelectedCurrencies(saved as CurrencyCode[]);
+      if (!saved.includes(activeCurrency)) {
+        setActiveCurrency(saved[0] as CurrencyCode);
+      }
+    };
+    loadCurrencies();
+  }, [isFocused]);
 
   const appendDigit = (digit: string) => {
     if (isNewAmount) {
@@ -83,7 +96,13 @@ export default function Screen() {
       <View className='flex-row gap-2'>
         <KeypadButton label='.' onPress={() => appendDigit('.')} />
         <KeypadButton label='0' onPress={() => appendDigit('0')} />
-        <KeypadButton label='' onPress={handleBackspace} isIcon={true} IconComponent={<Delete size={24} strokeWidth={2.5} />} />
+        <KeypadButton 
+          label='' 
+          onPress={handleBackspace} 
+          isIcon={true} 
+          IconComponent={<Delete size={24} strokeWidth={2.5} />}
+          disabled={amount === '0'} 
+        />
       </View>
       <KeypadButton label='Clear' onPress={clearAmount} />
     </View>

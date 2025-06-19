@@ -2,19 +2,31 @@ import * as React from 'react';
 import { View, ScrollView, TextInput, Pressable } from 'react-native';
 import { Text } from '~/components/ui/text';
 import { Switch } from '~/components/ui/switch';
-import { AVAILABLE_CURRENCIES } from '~/lib/constants';
+import { AVAILABLE_CURRENCIES, type CurrencyCode } from '~/lib/constants';
 import { Search, X } from 'lucide-react-native';
+import { getSelectedCurrencies, setSelectedCurrencies } from '~/lib/utils';
+import { router } from 'expo-router';
 
 export default function EditCurrenciesScreen() {
-  const [selectedCurrencies, setSelectedCurrencies] = React.useState<string[]>(['EUR', 'GBP', 'JPY', 'AUD']);
+  const [selectedCurrencies, setSelectedCurrenciesState] = React.useState<CurrencyCode[]>([]);
   const [searchQuery, setSearchQuery] = React.useState('');
 
-  const toggleCurrency = (code: string) => {
-    setSelectedCurrencies(prev => 
-      prev.includes(code)
-        ? prev.filter(c => c !== code)
-        : [...prev, code]
-    );
+  // Load saved currencies on mount
+  React.useEffect(() => {
+    const loadCurrencies = async () => {
+      const saved = await getSelectedCurrencies();
+      setSelectedCurrenciesState(saved);
+    };
+    loadCurrencies();
+  }, []);
+
+  const toggleCurrency = async (code: CurrencyCode) => {
+    const newSelection = selectedCurrencies.includes(code)
+      ? selectedCurrencies.filter(c => c !== code)
+      : [...selectedCurrencies, code];
+    
+    setSelectedCurrenciesState(newSelection);
+    await setSelectedCurrencies(newSelection);
   };
 
   const clearSearch = () => {
@@ -32,7 +44,6 @@ export default function EditCurrenciesScreen() {
   return (
     <ScrollView className='flex-1 bg-gray-100'>
       <View className='p-4 gap-4'>
-
         <View className='flex-row items-center bg-white rounded-lg px-3 h-12'>
           <Search size={20} color="#666" />
           <TextInput
@@ -69,6 +80,7 @@ export default function EditCurrenciesScreen() {
                   <Text className='text-xl'>{currency.flag}</Text>
                   <View>
                     <Text className='text-l'>{currency.code}</Text>
+                    <Text className='text-sm text-gray-500'>{currency.name}</Text>
                   </View>
                 </View>
                 
