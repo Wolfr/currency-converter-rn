@@ -20,6 +20,7 @@ export default function RootLayout() {
           name='index'
           options={{
             title: 'Currency Converter',
+            headerTitleAlign: 'center',
             headerLeft: () => <LanguageToggle />,
             headerRight: () => <EditCurrenciesToggle />,
           }}

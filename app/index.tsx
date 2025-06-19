@@ -65,35 +65,26 @@ export default function Screen() {
 
   const renderKeypad = () => (
     <View className='gap-2'>
-      {/* Row 1: 7-8-9 */}
       <View className='flex-row gap-2'>
         {['7', '8', '9'].map(digit => (
           <KeypadButton key={digit} label={digit} onPress={() => appendDigit(digit)} />
         ))}
       </View>
-      
-      {/* Row 2: 4-5-6 */}
       <View className='flex-row gap-2'>
         {['4', '5', '6'].map(digit => (
           <KeypadButton key={digit} label={digit} onPress={() => appendDigit(digit)} />
         ))}
       </View>
-      
-      {/* Row 3: 1-2-3 */}
       <View className='flex-row gap-2'>
         {['1', '2', '3'].map(digit => (
           <KeypadButton key={digit} label={digit} onPress={() => appendDigit(digit)} />
         ))}
       </View>
-      
-      {/* Row 4: .-0-backspace */}
       <View className='flex-row gap-2'>
         <KeypadButton label='.' onPress={() => appendDigit('.')} />
         <KeypadButton label='0' onPress={() => appendDigit('0')} />
         <KeypadButton label='' onPress={handleBackspace} isIcon={true} IconComponent={<Delete size={24} strokeWidth={2.5} />} />
       </View>
-
-      {/* Row 5: Clear (full width) */}
       <KeypadButton label='Clear' onPress={clearAmount} />
     </View>
   );
@@ -143,13 +134,11 @@ export default function Screen() {
       }}
     >
       {isLandscape ? (
-        // Landscape layout
         <View className='flex-1 flex-row gap-4'>
           <View className='flex-1 p-4'>
             {renderCurrencyList()}
           </View>
           <View className='justify-end p-4' style={{ 
-            // Add extra padding for Dynamic Island in landscape
             paddingTop: Platform.OS === 'ios' ? 12 : 0,
             width: 280
           }}>
@@ -157,7 +146,6 @@ export default function Screen() {
           </View>
         </View>
       ) : (
-        // Portrait layout
         <View className='flex-1'>
           <View className='p-4'>
             {renderCurrencyList()}
