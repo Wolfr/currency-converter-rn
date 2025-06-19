@@ -18,6 +18,7 @@ export const AVAILABLE_CURRENCIES = [
   { code: 'CAD', name: 'Canadian Dollar', flag: '🇨🇦' },
   { code: 'CHF', name: 'Swiss Franc', flag: '🇨🇭' },
   { code: 'CNY', name: 'Chinese Yuan', flag: '🇨🇳' },
+  { code: 'MXN', name: 'Mexican Peso', flag: '🇲🇽' },
 ] as const;
 
 export type CurrencyCode = typeof AVAILABLE_CURRENCIES[number]['code'];
@@ -32,4 +33,5 @@ export const MOCK_EXCHANGE_RATES: Record<CurrencyCode, number> = {
   CAD: 1.35,
   CHF: 0.87,
   CNY: 7.19,
+  MXN: 16.71,
 };

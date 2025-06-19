@@ -13,10 +13,19 @@ export function Checkbox({ checked, onCheckedChange, disabled }: CheckboxProps) 
     <Pressable
       disabled={disabled}
       onPress={() => onCheckedChange(!checked)}
-      className='h-5 w-5 items-center justify-center rounded border border-primary'
-      style={checked ? { backgroundColor: '#000' } : {}}
+      className={`h-6 w-6 items-center justify-center rounded-md border ${
+        checked 
+          ? 'bg-blue-500 border-blue-500' 
+          : 'border-gray-300 bg-white'
+      }`}
     >
-      {checked && <Check className='text-white' size={14} />}
+      {checked && (
+        <Check 
+          color="white"
+          size={16} 
+          strokeWidth={3}
+        />
+      )}
     </Pressable>
   );
 } 
