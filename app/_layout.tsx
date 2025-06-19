@@ -21,7 +21,7 @@ export default function RootLayout() {
           options={{
             title: 'Currency Converter',
             headerTitleAlign: 'center',
-            headerLeft: () => <LanguageToggle />,
+            //headerLeft: () => <LanguageToggle />,
             headerRight: () => <EditCurrenciesToggle />,
           }}
         />
